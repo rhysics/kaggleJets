@@ -1,4 +1,5 @@
 import os
+import json
 import numpy as np
 import pandas as pd
 import h5py
@@ -228,8 +229,32 @@ def extract_cluster_features(clusters):
     return features
 
 
-def get_auc_score(y_true, y_pred_proba): 
+def get_auc_score(y_true, y_pred_proba):
     fpr, tpr, thresholds = roc_curve(y_true, y_pred_proba)
     roc_auc = auc(fpr, tpr)
     return roc_auc
+
+
+def save_benchmark_info(model_name, val_score, output_dir):
+    """
+    Save/update a model's validation score in a shared benchmark JSON file.
+
+    Args:
+        model_name (str): Name of the model, used as the key in the JSON file
+        val_score (float): Validation score for the model
+        output_dir (str): Directory to write the benchmark JSON file to (created if missing)
+    """
+    os.makedirs(output_dir, exist_ok=True)
+    benchmark_path = os.path.join(output_dir, 'benchmark_results.json')
+
+    if os.path.exists(benchmark_path):
+        with open(benchmark_path, 'r') as f:
+            results = json.load(f)
+    else:
+        results = {}
+
+    results[model_name] = val_score
+
+    with open(benchmark_path, 'w') as f:
+        json.dump(results, f, indent=4)
 
