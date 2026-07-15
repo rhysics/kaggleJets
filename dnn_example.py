@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 import keras
 from sklearn.preprocessing import StandardScaler
-from utils.jet_utils import load_processed_data, save_benchmark_info
+from utils.jet_utils import load_processed_data, save_benchmark_info, model_metrics
 from utils.jet_plotting_utils import plot_training_history, plot_confusion_matrix, plot_roc_curve
 
 model_name = "default_dnn_64_32_32_16" 
@@ -54,7 +54,7 @@ model.summary()
 history = model.fit(
     X_train_scaled, y_train,
     epochs=500, # how many times do we go through the full dataset
-    batch_size=64, # how many data samples do we consider before updating our model 
+    batch_size=32, # how many data samples do we consider before updating our model 
     validation_data=(X_val_scaled, y_val),
     callbacks=[
         keras.callbacks.EarlyStopping(patience=20, restore_best_weights=True)
@@ -73,7 +73,7 @@ y_pred = (model.predict(X_val_scaled) > 0.5).astype(int)
 
 # Plot confusion matrix
 plot_confusion_matrix(y_val, y_pred)
-
+val_metrics = model_metrics(y_val, y_pred)
 plot_roc_curve(y_val, model.predict(X_val_scaled))
 
-save_benchmark_info(model_name, test_accuracy, "output")
+save_benchmark_info(model_name, val_metrics, "output")

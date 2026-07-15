@@ -6,7 +6,7 @@ import h5py
 from scipy.spatial.distance import pdist, squareform
 from sklearn.model_selection import train_test_split
 import torch
-from sklearn.metrics import roc_curve, auc
+from sklearn.metrics import roc_curve, auc, accuracy_score, recall_score, f1_score
 
 def preprocess_jet_images(jet_images, target_size=(32, 32)):
     """
@@ -234,14 +234,31 @@ def get_auc_score(y_true, y_pred_proba):
     roc_auc = auc(fpr, tpr)
     return roc_auc
 
-
-def save_benchmark_info(model_name, val_score, output_dir):
+def model_metrics(y_true, y_pred):
     """
-    Save/update a model's validation score in a shared benchmark JSON file.
+    Compute accuracy, recall and f1 score for a set of predictions.
+
+    Args:
+        y_true: Ground truth labels
+        y_pred: Predicted labels (discrete, not probabilities)
+
+    Returns:
+        dict: {'accuracy': ..., 'recall': ..., 'f1': ...}
+    """
+    return {
+        'accuracy': accuracy_score(y_true, y_pred),
+        'recall': recall_score(y_true, y_pred),
+        'f1': f1_score(y_true, y_pred)
+    }
+
+
+def save_benchmark_info(model_name, val_metrics, output_dir):
+    """
+    Save/update a model's validation metrics in a shared benchmark JSON file.
 
     Args:
         model_name (str): Name of the model, used as the key in the JSON file
-        val_score (float): Validation score for the model
+        val_metrics (dict): Validation metrics for the model, e.g. output of model_metrics()
         output_dir (str): Directory to write the benchmark JSON file to (created if missing)
     """
     os.makedirs(output_dir, exist_ok=True)
@@ -253,7 +270,7 @@ def save_benchmark_info(model_name, val_score, output_dir):
     else:
         results = {}
 
-    results[model_name] = val_score
+    results[model_name] = val_metrics
 
     with open(benchmark_path, 'w') as f:
         json.dump(results, f, indent=4)

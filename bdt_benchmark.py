@@ -6,7 +6,7 @@ import xgboost as xgb
 from sklearn.metrics import accuracy_score
 import matplotlib.pyplot as plt
 import seaborn as sns
-from utils.jet_utils import load_processed_data, save_benchmark_info
+from utils.jet_utils import load_processed_data,model_metrics, save_benchmark_info
 from utils.jet_plotting_utils import plot_confusion_matrix, plot_roc_curve
 
 
@@ -45,6 +45,7 @@ print(f"Test Accuracy: {accuracy:.4f}")
 
 # Plot confusion matrix
 plot_confusion_matrix(y_val, discrete_pred)
+val_metrics = model_metrics(y_val, discrete_pred)
 
 importance = model.feature_importances_
 feature_importance = pd.DataFrame({
@@ -58,4 +59,4 @@ plt.title('Feature Importance')
 plt.tight_layout() 
 plt.show()
 
-save_benchmark_info("default_bdt", accuracy, "output")
+save_benchmark_info("default_bdt", val_metrics, "output")
