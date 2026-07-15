@@ -6,7 +6,7 @@ import xgboost as xgb
 from sklearn.metrics import accuracy_score
 import matplotlib.pyplot as plt
 import seaborn as sns
-from utils.jet_utils import load_processed_data 
+from utils.jet_utils import load_processed_data, save_benchmark_info
 from utils.jet_plotting_utils import plot_confusion_matrix, plot_roc_curve
 
 
@@ -57,3 +57,5 @@ sns.barplot(x='importance', y='feature', data=feature_importance)
 plt.title('Feature Importance')
 plt.tight_layout() 
 plt.show()
+
+save_benchmark_info("default_bdt", accuracy, "output")
