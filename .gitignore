@@ -1,5 +1,6 @@
 .DS_Store
 output/
+*.pt
 
 # python Boilerplate from https://github.com/github/gitignore/blob/main/Python.gitignore
 
