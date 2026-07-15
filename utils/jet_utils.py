@@ -21,27 +21,28 @@ def preprocess_jet_images(jet_images, target_size=(32, 32)):
         processed_images[key] = images / np.max(images)
     return processed_images
 
-def load_processed_data():
+def load_processed_data(path_prefix='/Users/rhystaus/Documents/Profesional/codas/kaggleJets/data'):
     """
     Load processed data with unique IDs.
     
     Returns:
         tuple: (X_train, y_train, train_ids, X_val, y_val, val_ids, X_test, y_test, test_ids)
     """
+
     # Load training data
-    X_train = pd.read_csv('/Users/rhystaus/Documents/Profesional/codas/kaggleJets/data/train/features/cluster_features.csv')
-    y_train = np.load('/Users/rhystaus/Documents/Profesional/codas/kaggleJets/data/train/labels/labels.npy')
-    train_ids = np.load('/Users/rhystaus/Documents/Profesional/codas/kaggleJets/data/train/ids/ids.npy')
+    X_train = pd.read_csv(f'{path_prefix}/train/features/cluster_features.csv')
+    y_train = np.load(f'{path_prefix}/train/labels/labels.npy')
+    train_ids = np.load(f'{path_prefix}/train/ids/ids.npy')
 
     # Load validation data
-    X_val = pd.read_csv('/Users/rhystaus/Documents/Profesional/codas/kaggleJets/data/val/features/cluster_features.csv')
-    y_val = np.load('/Users/rhystaus/Documents/Profesional/codas/kaggleJets/data/val/labels/labels.npy')
-    val_ids = np.load('/Users/rhystaus/Documents/Profesional/codas/kaggleJets/data/val/ids/ids.npy')
-    
+    X_val = pd.read_csv(f'{path_prefix}/val/features/cluster_features.csv')
+    y_val = np.load(f'{path_prefix}/val/labels/labels.npy')
+    val_ids = np.load(f'{path_prefix}/val/ids/ids.npy')
+
     # Load test data
-    X_test = pd.read_csv('/Users/rhystaus/Documents/Profesional/codas/kaggleJets/data/test/features/cluster_features.csv')
-    test_ids = np.load('/Users/rhystaus/Documents/Profesional/codas/kaggleJets/data/test/ids/ids.npy')
-    
+    X_test = pd.read_csv(f'{path_prefix}/test/features/cluster_features.csv')
+    test_ids = np.load(f'{path_prefix}/test/ids/ids.npy')
+
     return X_train, y_train, train_ids, X_val, y_val, val_ids, X_test, test_ids
 
 def load_images():
