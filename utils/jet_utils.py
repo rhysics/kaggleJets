@@ -1,5 +1,6 @@
 import os
 import json
+from pathlib import Path
 import numpy as np
 import pandas as pd
 import h5py
@@ -7,6 +8,13 @@ from scipy.spatial.distance import pdist, squareform
 from sklearn.model_selection import train_test_split
 import torch
 from sklearn.metrics import roc_curve, auc, accuracy_score, recall_score, f1_score
+
+
+def _get_project_path(project_path=None):
+    """Resolve the repository root from the provided path or the current file location."""
+    if project_path is not None:
+        return Path(project_path).expanduser().resolve()
+    return Path(__file__).resolve().parents[1]
 
 def preprocess_jet_images(jet_images, target_size=(32, 32)):
     """
@@ -22,55 +30,57 @@ def preprocess_jet_images(jet_images, target_size=(32, 32)):
         processed_images[key] = images / np.max(images)
     return processed_images
 
-def load_processed_data(project_path='/Users/rhystaus/Documents/Profesional/codas/kaggleJets/'):
+def load_processed_data(project_path=None):
     """
     Load processed data with unique IDs.
     
     Returns:
-        tuple: (X_train, y_train, train_ids, X_val, y_val, val_ids, X_test, y_test, test_ids)
+        tuple: (X_train, y_train, train_ids, X_val, y_val, val_ids, X_test, test_ids)
     """
+    project_path = _get_project_path(project_path)
 
     # Load training data
-    X_train = pd.read_csv(f'{project_path}/data/train/features/cluster_features.csv')
-    y_train = np.load(f'{project_path}/data/train/labels/labels.npy')
-    train_ids = np.load(f'{project_path}/data/train/ids/ids.npy')
+    X_train = pd.read_csv(project_path / 'data' / 'train' / 'features' / 'cluster_features.csv')
+    y_train = np.load(project_path / 'data' / 'train' / 'labels' / 'labels.npy')
+    train_ids = np.load(project_path / 'data' / 'train' / 'ids' / 'ids.npy')
 
     # Load validation data
-    X_val = pd.read_csv(f'{project_path}/data/val/features/cluster_features.csv')
-    y_val = np.load(f'{project_path}/data/val/labels/labels.npy')
-    val_ids = np.load(f'{project_path}/data/val/ids/ids.npy')
+    X_val = pd.read_csv(project_path / 'data' / 'val' / 'features' / 'cluster_features.csv')
+    y_val = np.load(project_path / 'data' / 'val' / 'labels' / 'labels.npy')
+    val_ids = np.load(project_path / 'data' / 'val' / 'ids' / 'ids.npy')
 
     # Load test data
-    X_test = pd.read_csv(f'{project_path}/data/test/features/cluster_features.csv')
-    test_ids = np.load(f'{project_path}/data/test/ids/ids.npy')
+    X_test = pd.read_csv(project_path / 'data' / 'test' / 'features' / 'cluster_features.csv')
+    test_ids = np.load(project_path / 'data' / 'test' / 'ids' / 'ids.npy')
 
     return X_train, y_train, train_ids, X_val, y_val, val_ids, X_test, test_ids
 
-def load_images():
+def load_images(project_path=None):
     """
     Load jet images and labels with unique IDs.
     
     Returns:
         tuple: (X_train_images, y_train, train_ids, X_val_images, y_val, val_ids, X_test_images, y_test, test_ids)
     """
+    project_path = _get_project_path(project_path)
+
     # Load training data
-    y_train = np.load('/Users/rhystaus/Documents/Profesional/codas/kaggleJets/data/train/labels/labels.npy')
-    train_ids = np.load('/Users/rhystaus/Documents/Profesional/codas/kaggleJets/data/train/ids/ids.npy')
-    with h5py.File('/Users/rhystaus/Documents/Profesional/codas/kaggleJets/data/train/images/jet_images.h5', 'r') as f:
-            X_train_images = np.expand_dims(f['images'][:], axis=-1)
-    
+    y_train = np.load(project_path / 'data' / 'train' / 'labels' / 'labels.npy')
+    train_ids = np.load(project_path / 'data' / 'train' / 'ids' / 'ids.npy')
+    with h5py.File(project_path / 'data' / 'train' / 'images' / 'jet_images.h5', 'r') as f:
+        X_train_images = np.expand_dims(f['images'][:], axis=-1)
+
     # Load validation data
-    y_val = np.load('/Users/rhystaus/Documents/Profesional/codas/kaggleJets/data/val/labels/labels.npy')
-    val_ids = np.load('/Users/rhystaus/Documents/Profesional/codas/kaggleJets/data/val/ids/ids.npy')
-    with h5py.File('/Users/rhystaus/Documents/Profesional/codas/kaggleJets/data/val/images/jet_images.h5', 'r') as f:
-            X_val_images = np.expand_dims(f['images'][:], axis=-1)
-    
+    y_val = np.load(project_path / 'data' / 'val' / 'labels' / 'labels.npy')
+    val_ids = np.load(project_path / 'data' / 'val' / 'ids' / 'ids.npy')
+    with h5py.File(project_path / 'data' / 'val' / 'images' / 'jet_images.h5', 'r') as f:
+        X_val_images = np.expand_dims(f['images'][:], axis=-1)
+
     # Load test data
-    test_ids = np.load('/Users/rhystaus/Documents/Profesional/codas/kaggleJets/data/test/ids/ids.npy')
-    with h5py.File('/Users/rhystaus/Documents/Profesional/codas/kaggleJets/data/test/images/jet_images.h5', 'r') as f:
-            X_test_images = np.expand_dims(f['images'][:], axis=-1)
-    
-    
+    test_ids = np.load(project_path / 'data' / 'test' / 'ids' / 'ids.npy')
+    with h5py.File(project_path / 'data' / 'test' / 'images' / 'jet_images.h5', 'r') as f:
+        X_test_images = np.expand_dims(f['images'][:], axis=-1)
+
     return X_train_images, y_train, train_ids, X_val_images, y_val, val_ids, X_test_images, test_ids
 
 def anti_kt_clustering(image, R=0.4, pt_min=0.1):
