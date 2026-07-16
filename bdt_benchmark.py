@@ -19,9 +19,9 @@ X_train.head()
 
 # Initialize and train model
 model = xgb.XGBClassifier(
-    n_estimators=100,  # Number of boosting rounds
-    max_depth=5,      # Maximum tree depth
-    learning_rate=0.1, # Step size shrinkage
+    n_estimators=200,  # Number of boosting rounds
+    max_depth=10,      # Maximum tree depth
+    learning_rate=1e-2, # Step size shrinkage
     objective='binary:logistic',  # Binary classification
     random_state=42
 )
@@ -59,4 +59,12 @@ plt.title('Feature Importance')
 plt.tight_layout() 
 plt.show()
 
-save_benchmark_info("default_bdt", val_metrics, "output")
+model_name = "bdt_200_estimators_max_depth_10_learning_rate_0.01"
+save_benchmark_info(model_name, val_metrics, "output")
+
+
+
+test_predictions = model.predict_proba(X_test)[:, 1]
+solution = pd.DataFrame({'id':test_ids, 'label':test_predictions})
+solution.to_csv('submission.csv', index=False)
+

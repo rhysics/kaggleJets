@@ -54,7 +54,7 @@ model.summary()
 history = model.fit(
     X_train_scaled, y_train,
     epochs=500, # how many times do we go through the full dataset
-    batch_size=32, # how many data samples do we consider before updating our model 
+    batch_size=128, # how many data samples do we consider before updating our model 
     validation_data=(X_val_scaled, y_val),
     callbacks=[
         keras.callbacks.EarlyStopping(patience=20, restore_best_weights=True)
