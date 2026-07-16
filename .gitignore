@@ -1,6 +1,7 @@
 .DS_Store
 output/
 *.pt
+submission.csv
 
 # python Boilerplate from https://github.com/github/gitignore/blob/main/Python.gitignore
 
