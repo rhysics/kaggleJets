@@ -4,13 +4,17 @@ import matplotlib.pyplot as plt
 from .jet_dataloader import prepare_constituents
 from .jet_utils import pixelize, load_images
 
-def build_image_array(images, augment, n_copies, pt_smear, pos_smear, seed, cap=None):
-    """Turn raw jet images into canonicalized, L1-normalized 30x30 images.
+def build_image_array(
+    images, augment, n_copies, pt_smear, pos_smear, seed, cap=None, normalize=True
+):
+    """Turn raw jet images into canonicalized 30x30 images.
 
     When ``augment`` is set, each jet contributes one clean copy plus
     ``n_copies`` smeared copies (smear-then-canonicalize, matching the training
-    pipeline). Returns the image stack and the index of the source jet for each
-    row, so labels can be gathered with ``labels[label_idx]``.
+    pipeline). ``normalize`` L1-normalizes each image to sum 1; leaving it off
+    keeps the (max-normalized) energy scale, which e.g. ROCKET's max-pooling
+    feature can exploit. Returns the image stack and the index of the source
+    jet for each row, so labels can be gathered with ``labels[label_idx]``.
     """
     if cap is not None:
         images = images[:cap]
@@ -29,8 +33,10 @@ def build_image_array(images, augment, n_copies, pt_smear, pos_smear, seed, cap=
                 rng=rng,
             )
             grid = pixelize(cons).astype(np.float32)
-            total = grid.sum()
-            grids.append(grid / total if total > 0 else grid)
+            if normalize:
+                total = grid.sum()
+                grid = grid / total if total > 0 else grid
+            grids.append(grid)
             label_idx.append(i)
     return np.stack(grids), np.asarray(label_idx)
 
